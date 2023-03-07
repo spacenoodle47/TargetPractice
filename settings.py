@@ -20,18 +20,18 @@ class Settings:
         self.rectangle_speed = 0.3
 
         # Ship
-        self.ship_speed = 1.0
+        self.ship_speed = 2.0
         self.dynamic_stats()
 
         # Bullet
-        self.bullet_speed = 2.0
+        self.bullet_speed = 6.0
         self.bullet_width = 50
         self.bullet_height = 30
         self.bullet_color = (230, 0, 0)
         self.bullets_allowed = 3
 
         # Game
-        self.game_active = False
+        self.game_active = True
 
         # Play button
         self.btn_play_width, self.btn_play_height = (50, 35)
@@ -39,5 +39,6 @@ class Settings:
 
 
     def dynamic_stats(self):
-        '''Dynamic stats that reset on new game'''
+        '''Dynamic stats that reset/change on new game/during game'''
         self.ship_lives = 3
+        self.game_points = 50

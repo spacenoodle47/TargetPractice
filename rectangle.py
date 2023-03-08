@@ -59,3 +59,5 @@ class Rectangle(Sprite):
         '''Draws the rectangle to the screen'''
         pygame.draw.rect(self.screen,
              self.settings.rectangle_color, self.rect)
+
+        # Can I use spriteGroup built-in .draw() method instead??

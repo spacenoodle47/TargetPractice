@@ -58,3 +58,5 @@ class RocketLauncher:
     def blitme(self):
         '''Draw the rocket launcher to the screen'''
         self.screen.blit(self.image_flip, self.rect)
+
+        # Is it better to make everything a Sprite???

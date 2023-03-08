@@ -7,6 +7,7 @@ from rectangle import Rectangle
 from rocket_launcher import RocketLauncher
 from bullet import Bullet
 from button import Button
+from game_stats import GameStats
 
 
 class TargetPractice:
@@ -21,7 +22,7 @@ class TargetPractice:
         # Settings object
         self.settings = Settings()
 
-        # Create surface
+        # Create display surface
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Target Practice")
@@ -33,10 +34,17 @@ class TargetPractice:
 
         # Create instance of Rectangle class
         self.rectangle = Rectangle(self)
-        self.btn_play = Button(self)
+        # Better coding to use GroupSingle() for collision
+
+        self.btn_play = Button(self, 'Play')
+        self.game_stats = GameStats(self)
 
         # Create a group for the bullets
         self.bullets = pygame.sprite.Group()
+
+        # Custom events -- where to put these???
+        self.increase_diff_event = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.increase_diff_event, 15000)
 
     def run_game(self):
         '''The main loop of the game'''
@@ -49,6 +57,7 @@ class TargetPractice:
 
                 self.rocket_launcher.move()
                 self._update_bullets()
+                self._collisions()
                 self.rectangle.moving_vertically()
 
             self._update_screen()
@@ -67,14 +76,17 @@ class TargetPractice:
                 self._check_keyup_release(event)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                print(mouse_pos)
-                self._new_game(mouse_pos)
+                self.play_btn_pressed(mouse_pos)
+            if self.settings.game_active and event.type == self.increase_diff_event:
+                self.settings.increase_level()
 
 
     def _check_keydown_press(self, event):
         '''Responds to keydown presses'''
         if event.key == pygame.K_q:
             sys.exit()
+        if event.key == pygame.K_r and not self.settings.game_active:
+            self._reset_game()
         elif event.key == pygame.K_UP:
             self.rocket_launcher.moving_up = True
         elif event.key == pygame.K_DOWN:
@@ -97,39 +109,54 @@ class TargetPractice:
             bullet = Bullet(self)
             self.bullets.add(bullet)
 
-    def _new_game(self, mouse_pos):
+    def play_btn_pressed(self, mouse_pos):
         '''On Play-button click: start new game'''
 
         # If a given argument's point is overlapping
         # with the corresponding rect
-        button_pressed = self.btn_play.btn_rect.collidepoint(mouse_pos)
+        button_pressed = self.btn_play.play_btn_rect.collidepoint(mouse_pos)
         if button_pressed and not self.settings.game_active:
-            self.settings.game_active = True
-            self.rocket_launcher.center_rocket()
-            self.settings.dynamic_stats()
-            self.bullets.empty()
-            pygame.mouse.set_visible(False)
+            self._reset_game()
 
 
 
     def _game_over(self):
         '''When the ships loses its lifes'''
-        self.settings.ship_lives -= 1
         if self.settings.ship_lives == 0:
             self.settings.game_active = False
+
+    def _reset_game(self):
+        '''Resets the settings, stats and positions of game elements'''
+        self.settings.game_active = True
+        self.rocket_launcher.center_rocket()
+        self.settings.dynamic_stats()
+        self.bullets.empty()
+        self.game_stats.score = 0
+        self.game_stats.render_score()
+        pygame.mouse.set_visible(False)
 
     def _update_bullets(self):
         '''Handles the creation, removal and collision of bullets.
         Also updates its position'''
 
-        collision = pygame.sprite.spritecollide(self.rectangle, self.bullets, True)
 
         self.bullets.update()
         # Iterate over copy of the group to remove items while iterating
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.settings.screen_width:
                 self.bullets.remove(bullet)
+                self.settings.ship_lives -= 1
                 self._game_over()
+
+    def _collisions(self):
+        '''Handles the collisions between game elements'''
+
+        collision = pygame.sprite.spritecollide(self.rectangle, self.bullets, True)
+
+        if collision:
+            self.game_stats.score += self.settings.game_points
+            self.game_stats.render_score()
+
 
     def _update_screen(self):
         '''Draws the objects to the screen and redraws the screen'''
@@ -143,6 +170,9 @@ class TargetPractice:
         # Draw rocket launcher to the screen
         self.rocket_launcher.blitme()
 
+        # Draws the stats to the screen
+        self.game_stats.draw()
+
         # Draw the bullets to the display surface
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
@@ -150,6 +180,8 @@ class TargetPractice:
         # If the game is inactive
         if not self.settings.game_active:
             self.btn_play.draw_button()
+            self.game_stats.draw_high()
+            self.game_stats.render_high_score()
             pygame.mouse.set_visible(True)
 
         # Redraw the screen at the end of the method

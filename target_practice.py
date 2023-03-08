@@ -42,6 +42,10 @@ class TargetPractice:
         # Create a group for the bullets
         self.bullets = pygame.sprite.Group()
 
+        # Custom events -- where to put these???
+        self.increase_diff_event = pygame.USEREVENT + 1
+        pygame.time.set_timer(self.increase_diff_event, 15000)
+
     def run_game(self):
         '''The main loop of the game'''
 
@@ -73,6 +77,8 @@ class TargetPractice:
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
                 self.play_btn_pressed(mouse_pos)
+            if self.settings.game_active and event.type == self.increase_diff_event:
+                self.settings.increase_level()
 
 
     def _check_keydown_press(self, event):
@@ -174,6 +180,8 @@ class TargetPractice:
         # If the game is inactive
         if not self.settings.game_active:
             self.btn_play.draw_button()
+            self.game_stats.draw_high()
+            self.game_stats.render_high_score()
             pygame.mouse.set_visible(True)
 
         # Redraw the screen at the end of the method

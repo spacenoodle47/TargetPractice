@@ -18,7 +18,7 @@ class Settings:
         self.rectangle_color = (129, 55, 241)
 
         # Ship
-        self.ship_speed = 2.0
+        self.ship_speed = 1.5
         self.dynamic_stats()
 
         # Bullet
@@ -43,7 +43,7 @@ class Settings:
 
     def dynamic_stats(self):
         '''Dynamic stats that reset/change on new game/during game'''
-        self.ship_lives = 3
+        self.ship_lives = 4
         self.game_points = 50
         self.rectangle_speed = 0.3
         self.rectangle_height = 100

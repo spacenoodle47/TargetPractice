@@ -41,7 +41,8 @@ class GameStats:
         self.high_score_image = self.font.render(
             text, False, self.score_color).convert_alpha()
         self.high_score_rect = self.high_score_image.get_rect(
-            topleft = self.screen_rect.topleft)
+            centerx = self.screen_rect.centerx,
+            centery = self.screen_rect.top + 80)
 
 
         # -- Draw method

@@ -45,6 +45,7 @@ class Settings:
         '''Dynamic stats that reset/change on new game/during game'''
         self.ship_lives = 4
         self.game_points = 50
+        self.planet_points = 10
         self.rectangle_speed = 0.3
         self.rectangle_height = 100
 

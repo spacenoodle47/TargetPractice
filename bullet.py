@@ -10,7 +10,7 @@ class Bullet(Sprite):
 
         self.screen = tp.screen
         self.screen_rect = self.screen.get_rect()
-        self.ship = tp.rocket_launcher
+        self.ship = tp.ship
         self.settings = tp.settings
 
         # Create rect and set position
